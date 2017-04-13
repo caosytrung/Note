@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,7 +30,7 @@ import static android.R.attr.id;
 public class DatabaseHelper implements IConstand {
 
     private static final String TAG = "mDatabaseHelper";
-    private static final String DB_NAME = "NoteDb.sqlite";
+    private static final String DB_NAME = "NoteDB.sqlite";
     private static final String TABLE_NAME = "note";
     private static final String DB_PATH_SUFF = "/databases/" ;
 
@@ -97,9 +98,16 @@ public class DatabaseHelper implements IConstand {
             int id = c.getInt(indexId);
             int type = c.getInt(indexType);
             int textColor = c.getInt(indextTextColor);
-            Date date = new Date(c.getLong(indexDate));
+            String dateS = c.getString(indexDate);
+            Log.d(TAG,"Formatttt" + " " + dateS);
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String imageS= c.getString(indexImageS);
-
+            Date date = null;
+            try {
+                date = simpleDateFormat.parse(dateS);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
             Note tmp = new Note(id,lable,body,type,textColor,imageS,date);
             noteList.add(tmp);
             Log.d(TAG,tmp.getImageS());
@@ -113,12 +121,13 @@ public class DatabaseHelper implements IConstand {
     }
 
     public int insertData(Note note){
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         ContentValues contentValues  = new ContentValues();
         contentValues.put(LABLE_ROW,note.getLabel());
         contentValues.put(BODY_ROW,note.getBody());
         contentValues.put(TYPE_ROW,note.getType());
         contentValues.put(TEXT_COLOR__ROW,note.getTextColor());
-        contentValues.put(DATE_ROW, Utils.currentDate());
+        contentValues.put(DATE_ROW,simpleDateFormat.format(new Date()));
         contentValues.put(IMAGE_S_ROW,note.getImageS());
         Log.d(TAG,note.getImageS());
 
@@ -132,13 +141,13 @@ public class DatabaseHelper implements IConstand {
 
     public boolean updateData(Note note){
         openDatabase();
-
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         ContentValues contentValues  = new ContentValues();
         contentValues.put(LABLE_ROW,note.getLabel());
         contentValues.put(BODY_ROW,note.getBody());
         contentValues.put(TYPE_ROW,note.getType());
         contentValues.put(TEXT_COLOR__ROW,note.getTextColor());
-        contentValues.put(DATE_ROW, Utils.currentDate());
+        contentValues.put(DATE_ROW,simpleDateFormat.format(new Date()));
         contentValues.put(IMAGE_S_ROW,note.getImageS());
 
         return mSqLiteDatabase.update(TABLE_NAME,contentValues,"id = '" + note.getId() + "'",null) > 0;

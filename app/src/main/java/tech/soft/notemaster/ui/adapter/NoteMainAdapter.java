@@ -1,30 +1,31 @@
 package tech.soft.notemaster.ui.adapter;
 
 import android.content.Context;
-import android.support.v7.widget.PopupMenu;
+import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
 
 import tech.soft.notemaster.R;
 import tech.soft.notemaster.models.Note;
-import tech.soft.notemaster.ui.acti.MainActivity;
 import tech.soft.notemaster.ui.calback.IOnItemClick;
+import tech.soft.notemaster.utils.IConstand;
+import tech.soft.notemaster.utils.Utils;
 
-import static android.os.Build.VERSION_CODES.N;
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.V;
 
 /**
  * Created by dee on 03/04/2017.
  */
 
-public class NoteMainAdapter extends RecyclerView.Adapter<NoteMainAdapter.ViewHolder> {
+public class NoteMainAdapter extends RecyclerView.Adapter<NoteMainAdapter.ViewHolder>
+    implements IConstand{
     private List<Note> noteList;
     private Context mContext;
     private IOnItemClick iOnItemClick;
@@ -37,7 +38,7 @@ public class NoteMainAdapter extends RecyclerView.Adapter<NoteMainAdapter.ViewHo
         this.noteList = noteList;
         mContext = context;
         this.iOnItemClick = iOnItemClick;
-        simpleDateFormat = new SimpleDateFormat("dd:MM HH:mm");
+        simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     }
 
@@ -47,18 +48,47 @@ public class NoteMainAdapter extends RecyclerView.Adapter<NoteMainAdapter.ViewHo
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(mContext);
-        View v = inflater.inflate(R.layout.item_note,parent,false);
+        switch (viewType){
+            case TYPE_TEXT:
+                View vType1 =LayoutInflater.from(mContext).
+                        inflate(R.layout.item_note_type_1,parent,false);
+                return new ViewHolderType1(vType1);
+            case TYPE_HAND_DWRAW:
+                View vType2 =LayoutInflater.from(mContext).
+                        inflate(R.layout.item_note_type_2,parent,false);
+                return new ViewHolderType2(vType2);
+            default:
+                return null;
+        }
 
-        return new ViewHolder(v);
+
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         Note note = noteList.get(position);
-        holder.tvLable.setText(note.getLabel());
-        holder.tvDate.setText(simpleDateFormat.format(note.getDateCreate()));
-        holder.tvPBody.setText(note.getBody());
+
+        switch (holder.getItemViewType()){
+            case TYPE_TEXT:
+                ViewHolderType1 viewHolderType1 = (ViewHolderType1)holder;
+                viewHolderType1.tvLable.setText(note.getLabel());
+                viewHolderType1.tvDate.setText(simpleDateFormat.format(note.getDateCreate()));
+                viewHolderType1.tvPBody.setText(note.getBody());
+                viewHolderType1.tvPBody.setTextColor(note.getTextColor());
+
+
+                break;
+            case TYPE_HAND_DWRAW:
+                ViewHolderType2 viewHolderType2 = (ViewHolderType2)holder;
+                viewHolderType2.tvLable.setText(note.getLabel());
+                Bitmap bitmap = Utils.stringToBitMap(note.getBody());
+                ((ViewHolderType2) holder).ivImage.setImageBitmap(bitmap);
+
+
+                break;
+        }
+
+
 
         holder.container.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,19 +111,54 @@ public class NoteMainAdapter extends RecyclerView.Adapter<NoteMainAdapter.ViewHo
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        private TextView tvLable;
-        private TextView tvDate;
-        private TextView tvPBody;
+
         private View container;
 
         public ViewHolder(View itemView) {
             super(itemView);
             container = itemView;
+
+        }
+    }
+
+    public class ViewHolderType1 extends ViewHolder{
+        private TextView tvLable;
+        private TextView tvDate;
+        private TextView tvPBody;
+        public ViewHolderType1(View itemView) {
+            super(itemView);
             tvLable = (TextView) itemView.
                     findViewById(R.id.tvItemNoteLable);
             tvDate = (TextView) itemView.
                     findViewById(R.id.tvitemNoteDate);
             tvPBody = (TextView) itemView.findViewById(R.id.tvItemNoteBody);
+        }
+    }
+
+    public class ViewHolderType2 extends ViewHolder{
+        private TextView tvLable;
+        private ImageView ivImage;
+
+        public ViewHolderType2(View itemView) {
+            super(itemView);
+            tvLable = (TextView) itemView.
+                    findViewById(R.id.tvItemNoteLableType2);
+            ivImage = (ImageView) itemView.findViewById(R.id.ivItemNoteType2);
+        }
+    }
+
+
+
+    @Override
+    public int getItemViewType(int position) {
+        switch (noteList.get(position).getType()){
+            case TYPE_TEXT:
+                return TYPE_TEXT;
+            case TYPE_HAND_DWRAW:
+                return TYPE_HAND_DWRAW;
+            default:
+                return  0;
+
         }
     }
 }

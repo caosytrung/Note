@@ -51,7 +51,7 @@ public class LinedEditText extends EditText {
         baseline = getLineHeight() * 2;
         mPaint = new Paint();
         mPaint.setColor(getResources().getColor(R.color.black_semi_transparent));
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < count*5; i++) {
 
 
             canvas.drawLine(0, baseline -40 , getWidth(), baseline -40

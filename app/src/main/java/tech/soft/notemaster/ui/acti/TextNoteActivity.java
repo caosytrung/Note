@@ -128,10 +128,9 @@ public class TextNoteActivity extends BaseActivity implements View.OnClickListen
         if (isEdit){
             edtLabel.setText(note.getLabel());
 
+             Type type1 = new TypeToken<ArrayList<ImageS>>() {}.getType();
 
-        Type type1 = new TypeToken<ArrayList<ImageS>>() {}.getType();
-
-        ArrayList<ImageS> finalOutputString = new Gson().fromJson(note.getImageS(), type1);
+             ArrayList<ImageS> finalOutputString = new Gson().fromJson(note.getImageS(), type1);
             if (null == finalOutputString){
                 edtBody.setText(note.getBody());
             }
@@ -151,20 +150,22 @@ public class TextNoteActivity extends BaseActivity implements View.OnClickListen
                     }
 
 
-                    builder.setSpan(new ImageSpan(bitmap),
+                    builder.setSpan(new ImageSpan(getResizedBitmap(bitmap,800,800)),
                             item.getS(),item.getE(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
                     );
                 }
                 edtBody.setText(builder);
-
-
-
             }
 
 
-            edtBody.setTextColor(note.getTextColor());
-        }
+            for (int i = 0 ; i < Utils.initListColor().size() ; i ++){
+                if (Color.parseColor(Utils.initListColor().get(i)) == note.getTextColor() ){
+                    spPenColor.setSelection(i);
+                    break;
+                }
+            }
 
+        }
 
     }
 

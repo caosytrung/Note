@@ -368,12 +368,15 @@ public class QuickWorkService extends Service implements View.OnTouchListener, V
             switch (v.getId()){
                 case  R.id.btnAddTextNoteBW:
                     int result = saveNote();
+                    edtBody.setText("");
+                    edtLable.setText("");
                     if (-1 == result){
                         Toast.makeText(getContext(),"ERROR,Please Try Again !!!",Toast.LENGTH_LONG).show();
                     } else {
                         Toast.makeText(getContext(),"Successfully to Save Note ",Toast.LENGTH_LONG).show();
                         mQuickWorkDialog.dismiss();
                         mWindowManager.addView(imageView,mParams);
+
                     }
                     break;
                 default:
@@ -383,6 +386,7 @@ public class QuickWorkService extends Service implements View.OnTouchListener, V
         }
 
         private int  saveNote() {
+            isShowSmall = true;
             String lable = edtLable.getText().toString();
             String body = edtBody.getText().toString();
             int currColr = currentColor;

@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,6 +29,7 @@ import tech.soft.notemaster.utils.IConstand;
 import tech.soft.notemaster.utils.Utils;
 
 import static android.R.attr.bitmap;
+import static android.R.attr.breadCrumbShortTitle;
 import static android.R.attr.type;
 import static android.R.string.no;
 import static android.os.Build.VERSION_CODES.N;
@@ -48,6 +50,7 @@ public class DrawNoteActivity extends BaseActivity implements View.OnClickListen
     private Spinner spWidthPen;
     private Spinner spColorBG;
 
+    private ImageView ivBack;
     private TextView tvAddNote;
     private TextView tvUndo;
     private EditText edtLabel;
@@ -106,6 +109,7 @@ public class DrawNoteActivity extends BaseActivity implements View.OnClickListen
         tvUndo = (TextView) findViewById(R.id.tvUndoDraw);
         tvAddNote = (TextView) findViewById(R.id.tvAddDraw);
         edtLabel = (EditText) findViewById(R.id.edtLabelDrawNote);
+        ivBack = (ImageView) findViewById(R.id.ivbackDraw);
 
         setupDrawNote();
 
@@ -161,6 +165,7 @@ public class DrawNoteActivity extends BaseActivity implements View.OnClickListen
     protected void setEventViews() {
         tvUndo.setOnClickListener(this);
         tvAddNote.setOnClickListener(this);
+        ivBack.setOnClickListener(this);
     }
 
     @Override
@@ -234,6 +239,12 @@ public class DrawNoteActivity extends BaseActivity implements View.OnClickListen
                 break;
             case R.id.tvUndoDraw:
                 dvDrawNote.undo();
+                break;
+            case R.id.ivbackDraw:
+                Intent intent = new Intent(DrawNoteActivity.this,MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                DrawNoteActivity.this.finish();
                 break;
             default:
                 break;
