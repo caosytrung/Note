@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/clMain"
+    android:fitsSystemWindows="true"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    tools:context="tech.soft.notemaster.ui.acti.MainActivity">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+    </android.support.design.widget.AppBarLayout>
+
+    <include layout="@layout/content_main" />
+
+    <com.getbase.floatingactionbutton.FloatingActionsMenu
+        android:id="@+id/fab_multiAction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
+        fab:fab_labelStyle="@style/menu_labels_main"
+        android:layout_gravity="right|bottom"
+        fab:fab_addButtonColorNormal="@color/colorPrimaryDark"
+        >
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_title="Handrite"
+            fab:fab_icon="@drawable/icon_pencil"
+            android:id="@+id/action_handrite"
+            fab:fab_colorNormal="@color/white"
+             fab:fab_colorPressed="@color/white_pressed"
+            />
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fab:fab_title="Text"
+            fab:fab_icon="@drawable/icon_text"
+            android:id="@+id/action_text"
+            fab:fab_colorNormal="@color/white"
+            fab:fab_labelStyle="@style/menu_labels_main"
+            fab:fab_colorPressed="@color/white_pressed"
+            />
+    </com.getbase.floatingactionbutton.FloatingActionsMenu>
+
+
+</android.support.design.widget.CoordinatorLayout>
