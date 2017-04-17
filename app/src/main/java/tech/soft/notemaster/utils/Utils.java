@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
@@ -64,9 +65,37 @@ public class Utils {
         listColor.add(4);
         listColor.add(8);
         listColor.add(16);
+        listColor.add(32);
         return listColor;
 
     }
+
+    public static List<Integer> initDialogColor() {
+        List<Integer> listColor = new ArrayList<>();
+
+
+        listColor.add(Color.parseColor("#FFEB3B"));
+        listColor.add(Color.parseColor("#000000"));
+        listColor.add(Color.parseColor("#F44336"));
+        listColor.add(Color.parseColor("#9C27B0"));
+        listColor.add(Color.parseColor("#673AB7"));
+        listColor.add(Color.parseColor("#2196F3"));
+        listColor.add(Color.parseColor("#8BC34A"));
+        listColor.add(Color.parseColor("#CDDC39"));
+        listColor.add(Color.parseColor("#FF9800"));
+
+        listColor.add(Color.parseColor("#ff00bf"));
+        listColor.add(Color.parseColor("#808080"));
+        listColor.add(Color.parseColor("#e60000"));
+        listColor.add(Color.parseColor("#795548"));
+        listColor.add(Color.parseColor("#607D8B"));
+        listColor.add(Color.parseColor("#00BCD4"));
+        listColor.add(Color.parseColor("#00897B"));
+
+        return listColor;
+    }
+
+
     public static String bitMapToString(Bitmap bitmap){
         ByteArrayOutputStream baos=new  ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG,100, baos);

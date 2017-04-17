@@ -4,8 +4,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -15,8 +13,6 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.io.ByteArrayOutputStream;
 
 import tech.soft.notemaster.R;
 import tech.soft.notemaster.controls.DatabaseHelper;
@@ -28,14 +24,7 @@ import tech.soft.notemaster.ui.customview.DrawingView;
 import tech.soft.notemaster.utils.IConstand;
 import tech.soft.notemaster.utils.Utils;
 
-import static android.R.attr.bitmap;
-import static android.R.attr.breadCrumbShortTitle;
-import static android.R.attr.type;
-import static android.R.string.no;
-import static android.os.Build.VERSION_CODES.N;
 import static tech.soft.notemaster.R.id.dvDraw;
-import static tech.soft.notemaster.R.id.tvAddDraw;
-import static tech.soft.notemaster.utils.Utils.bitMapToString;
 
 /**
  * Created by dee on 12/04/2017.
@@ -256,7 +245,7 @@ public class DrawNoteActivity extends BaseActivity implements View.OnClickListen
         String body = data;
         int currColr = curentColor;
         int type = TYPE_HAND_DWRAW;
-        Note noteTmp = new Note(note.getId(),lable,body,type,currColr,"");
+        Note noteTmp = new Note(note.getId(), lable, body, type, currColr, "", "", "");
         DatabaseHelper.getINSTANCE(this).updateData(noteTmp);
     }
 
@@ -266,7 +255,7 @@ public class DrawNoteActivity extends BaseActivity implements View.OnClickListen
         String body = data;
         int currColr = curentColor;
         int type = TYPE_HAND_DWRAW;
-        Note noteTmp = new Note(lable,body,type,currColr,"");
+        Note noteTmp = new Note(lable, body, type, currColr, "", "", "");
         DatabaseHelper.getINSTANCE(this).insertData(noteTmp);
     }
 }

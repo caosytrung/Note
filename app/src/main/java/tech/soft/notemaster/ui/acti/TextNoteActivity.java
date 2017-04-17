@@ -15,24 +15,23 @@ import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextPaint;
+import android.text.style.BackgroundColorSpan;
+import android.text.style.ForegroundColorSpan;
 import android.text.style.ImageSpan;
 import android.util.Log;
+import android.view.ActionMode;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
-
 import com.google.gson.Gson;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -42,15 +41,13 @@ import java.util.List;
 import tech.soft.notemaster.R;
 import tech.soft.notemaster.controls.DatabaseHelper;
 import tech.soft.notemaster.models.Note;
+import tech.soft.notemaster.models.sp_view.BackgroundS;
 import tech.soft.notemaster.models.sp_view.ImageS;
 import tech.soft.notemaster.ui.adapter.PenColorAdapter;
+import tech.soft.notemaster.ui.calback.ISetTextNote;
+import tech.soft.notemaster.ui.customview.ColorDialog;
 import tech.soft.notemaster.utils.IConstand;
 import tech.soft.notemaster.utils.Utils;
-
-import static android.R.attr.bitmap;
-import static android.R.attr.type;
-import static tech.soft.notemaster.R.id.image;
-import static tech.soft.notemaster.R.id.textView;
 
 /**
  * Created by dee on 23/03/2017.
@@ -127,18 +124,57 @@ public class TextNoteActivity extends BaseActivity implements View.OnClickListen
         });
         if (isEdit){
             edtLabel.setText(note.getLabel());
+            SpannableStringBuilder builder =
+                    new SpannableStringBuilder(note.getBody());
 
              Type type1 = new TypeToken<ArrayList<ImageS>>() {}.getType();
-
              ArrayList<ImageS> finalOutputString = new Gson().fromJson(note.getImageS(), type1);
+
+            Type type2 = new TypeToken<ArrayList<BackgroundS>>() {
+            }.getType();
+            ArrayList<BackgroundS> outBackground = new Gson().fromJson(note.getBackgroundS(), type2);
+
+            Type type3 = new TypeToken<ArrayList<BackgroundS>>() {
+            }.getType();
+            ArrayList<BackgroundS> outForeGround = new Gson().fromJson(note.getMutilColor(), type3);
+
+            if (null == outForeGround || outForeGround.size() == 0) {
+
+                Log.d(TAG, "MEKIPP");
+            } else {
+
+
+                for (BackgroundS item : outForeGround) {
+
+                    builder.setSpan(new ForegroundColorSpan(item.getColor()), item.getStart(),
+                            item.getEnd(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
+
+
+            }
+
+            if (null == outBackground || outBackground.size() == 0) {
+
+                Log.d(TAG, "MEKIPP");
+            } else {
+
+
+                for (BackgroundS item : outBackground) {
+
+                    builder.setSpan(new BackgroundColorSpan(item.getColor()), item.getStart(),
+                            item.getEnd(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
+
+
+            }
+
             if (null == finalOutputString){
-                edtBody.setText(note.getBody());
+
             }
             else  if (finalOutputString.size() == 0){
-                edtBody.setText(note.getBody());
+
             } else {
-                SpannableStringBuilder builder =
-                        new SpannableStringBuilder(note.getBody());
+
 
                 for (ImageS item: finalOutputString){
                     Bitmap bitmap = null;
@@ -154,8 +190,10 @@ public class TextNoteActivity extends BaseActivity implements View.OnClickListen
                             item.getS(),item.getE(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
                     );
                 }
-                edtBody.setText(builder);
+
             }
+
+            edtBody.setText(builder);
 
 
             for (int i = 0 ; i < Utils.initListColor().size() ; i ++){
@@ -167,6 +205,87 @@ public class TextNoteActivity extends BaseActivity implements View.OnClickListen
 
         }
 
+        edtBody.setCustomSelectionActionModeCallback(new AbsListView.MultiChoiceModeListener() {
+            @Override
+            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+
+            }
+
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                menu.add("H_L");
+                menu.add("Color");
+                return true;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                if (item.getTitle().equals("H_L")) {
+                    final int start = edtBody.getSelectionStart();
+                    final int end = edtBody.getSelectionEnd();
+                    String selectStr = edtBody.getText().
+                            toString().substring(start, end);
+                    ColorDialog dialog = new ColorDialog(TextNoteActivity.this,
+                            android.R.style.Theme_Translucent, 1, start, end
+                    );
+                    dialog.setiSetTextNote(new ISetTextNote() {
+                        @Override
+                        public void setText(int color, int s, int e) {
+                            setUpHighLightText(start, end, color);
+                        }
+                    });
+                    dialog.show();
+                    mode.finish();
+
+                } else if (item.getTitle().equals("Color")) {
+                    final int start = edtBody.getSelectionStart();
+                    final int end = edtBody.getSelectionEnd();
+
+                    ColorDialog dialog = new ColorDialog(TextNoteActivity.this,
+                            android.R.style.Theme_Translucent, 2, start, end
+                    );
+                    dialog.setiSetTextNote(new ISetTextNote() {
+                        @Override
+                        public void setText(int color, int s, int e) {
+                            setUpColorText(start, end, color);
+                        }
+                    });
+                    dialog.show();
+                    mode.finish();
+                }
+                return false;
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+
+            }
+        });
+
+
+    }
+
+    private void setUpHighLightText(int start, int end, int color) {
+        String selected = edtBody.getText().toString().substring(start, end);
+        SpannableStringBuilder builder = new SpannableStringBuilder(edtBody.getText());
+        builder.setSpan(new BackgroundColorSpan(color),
+                start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        edtBody.setText(builder);
+    }
+
+    private void setUpColorText(int start, int end, int color) {
+        String selected = edtBody.getText().toString().substring(start, end);
+        SpannableStringBuilder builder = new SpannableStringBuilder(edtBody.getText());
+        builder.setSpan(new ForegroundColorSpan(color),
+                start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        edtBody.setText(builder);
     }
 
     private void setUpMenu(){
@@ -203,7 +322,7 @@ public class TextNoteActivity extends BaseActivity implements View.OnClickListen
         // CREATE A MATRIX FOR THE MANIPULATION
         Matrix matrix = new Matrix();
         // RESIZE THE BIT MAP
-        matrix.postScale(scaleWidth, scaleHeight);
+        matrix.postScale(scaleHeight, scaleHeight);
 
         // "RECREATE" THE NEW BITMAP
 
@@ -302,11 +421,44 @@ public class TextNoteActivity extends BaseActivity implements View.OnClickListen
         }
     }
 
+    private String getListBackgroundS() {
+        SpannableString spannableString = new SpannableString(edtBody.getText());
+        List<BackgroundS> backgroundSes = new ArrayList<>();
+        BackgroundColorSpan[] backgroundColorSpen =
+                spannableString.getSpans(0, edtBody.length(), BackgroundColorSpan.class);
+        for (BackgroundColorSpan item : backgroundColorSpen) {
+            int s = edtBody.getText().getSpanStart(item);
+            int e = edtBody.getText().getSpanEnd(item);
+            backgroundSes.add(new BackgroundS(s, e, item.getBackgroundColor()));
+        }
+        Gson gson = new Gson();
+        String inputString = gson.toJson(backgroundSes);
+        Log.d(TAG, "inootSTRing " + inputString);
+        return inputString;
+    }
+
+    private String getListColorS() {
+        SpannableString spannableString = new SpannableString(edtBody.getText());
+        List<BackgroundS> backgroundSes = new ArrayList<>();
+        ForegroundColorSpan[] foregroundColorSpen =
+                spannableString.getSpans(0, edtBody.length(), ForegroundColorSpan.class);
+        for (ForegroundColorSpan item : foregroundColorSpen) {
+            int s = edtBody.getText().getSpanStart(item);
+            int e = edtBody.getText().getSpanEnd(item);
+            backgroundSes.add(new BackgroundS(s, e, item.getForegroundColor()));
+        }
+        Gson gson = new Gson();
+        String inputString = gson.toJson(backgroundSes);
+        Log.d(TAG, "inootSTRing " + inputString);
+        return inputString;
+    }
+
     private void saveNote() {
         Editable editable = edtBody.getText();
         SpannableString spannableString = new SpannableString(editable);
         String html = Html.toHtml(spannableString);
         SpannableString spanned = new SpannableString(Html.fromHtml(html));
+
         List<ImageS> imageS = new ArrayList<>();
         ImageSpan[] imageSpen = spannableString.getSpans(0,edtBody.length(),ImageSpan.class);
         for (ImageSpan imageSpan : imageSpen){
@@ -315,8 +467,8 @@ public class TextNoteActivity extends BaseActivity implements View.OnClickListen
             String uri = edtBody.getText().toString().substring(s,e);
             imageS.add(new ImageS(s,e,uri));
         }
-        Gson gson = new Gson();
 
+        Gson gson = new Gson();
         String inputString= gson.toJson(imageS);
 
 
@@ -327,7 +479,7 @@ public class TextNoteActivity extends BaseActivity implements View.OnClickListen
         String body = edtBody.getText().toString();
         int currColr = currentColor;
         int type = TYPE_TEXT;
-        Note noteTmp = new Note(lable,body,type,currColr,inputString);
+        Note noteTmp = new Note(lable, body, type, currColr, inputString, getListBackgroundS(), getListColorS());
         DatabaseHelper.getINSTANCE(this).insertData(noteTmp);
 
     }
@@ -356,7 +508,9 @@ public class TextNoteActivity extends BaseActivity implements View.OnClickListen
         String body = edtBody.getText().toString();
         int currColr = currentColor;
         int type = TYPE_TEXT;
-        Note noteTmp = new Note(note.getId(),lable,body,type,currColr,inputString);
+        Note noteTmp = new Note(note.getId(), lable, body,
+                type, currColr, inputString, getListBackgroundS(), getListColorS());
+
         if (DatabaseHelper.getINSTANCE(this).updateData(noteTmp)){
             Toast.makeText(this,"Update Success !!",Toast.LENGTH_LONG).show();
         } else {

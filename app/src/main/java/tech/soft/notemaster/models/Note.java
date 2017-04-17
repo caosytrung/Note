@@ -15,8 +15,13 @@ public class Note implements Serializable {
     private int textColor;
     private Date dateCreate;
     private String imageS;
+    private String backgroundS;
+    private String mutilColor;
 
-    public Note(int id, String label, String body, int type, int textColor,String imageS, Date dateCreate) {
+    public Note(int id, String label, String body,
+                int type, int textColor,
+                String imageS, Date dateCreate,
+                String backgroundS, String mutilColor) {
         this.id = id;
         this.label = label;
         this.body = body;
@@ -24,32 +29,55 @@ public class Note implements Serializable {
         this.textColor = textColor;
         this.dateCreate = dateCreate;
         this.imageS = imageS;
+        this.backgroundS = backgroundS;
+        this.mutilColor = mutilColor;
     }
-    public Note(int id, String label, String body, int type, int textColor,String imageS) {
+
+    public Note(int id, String label, String body,
+                int type, int textColor, String imageS,
+                String backgroundS, String mutilColor) {
         this.id = id;
         this.label = label;
         this.body = body;
         this.type = type;
         this.textColor = textColor;
         this.imageS = imageS;
+        this.backgroundS = backgroundS;
+        this.mutilColor = mutilColor;
     }
 
 
-    public Note(String label, String body, int type, int textColor,String imageS, Date dateCreate) {
+    public Note(String label, String body,
+                int type, int textColor, String imageS,
+                String backgroundS, String mutilColor,
+                Date dateCreate) {
         this.label = label;
         this.body = body;
         this.type = type;
         this.textColor = textColor;
         this.dateCreate = dateCreate;
+        this.backgroundS = backgroundS;
         this.imageS  = imageS;
+        this.mutilColor = mutilColor;
     }
 
-    public Note(String label, String body, int type, int textColor,String imageS) {
+    public Note(String label, String body, int type,
+                int textColor, String imageS, String backgroundS, String mutilColor) {
         this.label = label;
         this.body = body;
         this.type = type;
         this.textColor = textColor;
         this.imageS = imageS;
+        this.backgroundS = backgroundS;
+        this.mutilColor = mutilColor;
+    }
+
+    public String getMutilColor() {
+        return mutilColor;
+    }
+
+    public void setMutilColor(String mutilColor) {
+        this.mutilColor = mutilColor;
     }
 
     public int getId() {
@@ -106,5 +134,13 @@ public class Note implements Serializable {
 
     public void setImageS(String imageS) {
         this.imageS = imageS;
+    }
+
+    public String getBackgroundS() {
+        return backgroundS;
+    }
+
+    public void setBackgroundS(String backgroundS) {
+        this.backgroundS = backgroundS;
     }
 }

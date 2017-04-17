@@ -19,9 +19,6 @@ import java.util.List;
 
 import tech.soft.notemaster.models.Note;
 import tech.soft.notemaster.utils.IConstand;
-import tech.soft.notemaster.utils.Utils;
-
-import static android.R.attr.id;
 
 /**
  * Created by dee on 03/04/2017.
@@ -41,6 +38,8 @@ public class DatabaseHelper implements IConstand {
     public static  final  String TEXT_COLOR__ROW = "textColor";
     public static  final  String DATE_ROW = "dateCreate";
     public static  final  String IMAGE_S_ROW = "imageS";
+    public static final String BACKGROUND_ROW = "highlight";
+    public static final String MUTIL_COLOR_ROW = "mutilColor";
 
     private SimpleDateFormat dateFormat ;
     private Context mContext;
@@ -89,6 +88,8 @@ public class DatabaseHelper implements IConstand {
         int indextTextColor= c.getColumnIndex(TEXT_COLOR__ROW);
         int indexDate = c.getColumnIndex(DATE_ROW);
         int indexImageS = c.getColumnIndex(IMAGE_S_ROW);
+        int indexBackgroundS = c.getColumnIndex(BACKGROUND_ROW);
+        int indexMultilColor = c.getColumnIndex(MUTIL_COLOR_ROW);
 
         c.moveToFirst();
 
@@ -108,7 +109,11 @@ public class DatabaseHelper implements IConstand {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            Note tmp = new Note(id,lable,body,type,textColor,imageS,date);
+
+            String mutilColor = c.getString(indexMultilColor);
+            String background = c.getString(indexBackgroundS);
+            Note tmp = new Note(id, lable, body, type,
+                    textColor, imageS, date, background, mutilColor);
             noteList.add(tmp);
             Log.d(TAG,tmp.getImageS());
 
@@ -129,6 +134,9 @@ public class DatabaseHelper implements IConstand {
         contentValues.put(TEXT_COLOR__ROW,note.getTextColor());
         contentValues.put(DATE_ROW,simpleDateFormat.format(new Date()));
         contentValues.put(IMAGE_S_ROW,note.getImageS());
+        contentValues.put(BACKGROUND_ROW, note.getBackgroundS());
+        contentValues.put(MUTIL_COLOR_ROW, note.getMutilColor());
+
         Log.d(TAG,note.getImageS());
 
         openDatabase();
@@ -149,6 +157,8 @@ public class DatabaseHelper implements IConstand {
         contentValues.put(TEXT_COLOR__ROW,note.getTextColor());
         contentValues.put(DATE_ROW,simpleDateFormat.format(new Date()));
         contentValues.put(IMAGE_S_ROW,note.getImageS());
+        contentValues.put(BACKGROUND_ROW, note.getBackgroundS());
+        contentValues.put(MUTIL_COLOR_ROW, note.getMutilColor());
 
         return mSqLiteDatabase.update(TABLE_NAME,contentValues,"id = '" + note.getId() + "'",null) > 0;
 
