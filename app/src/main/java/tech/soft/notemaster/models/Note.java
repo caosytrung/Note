@@ -1,7 +1,6 @@
 package tech.soft.notemaster.models;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * Created by dee on 03/04/2017.
@@ -13,15 +12,16 @@ public class Note implements Serializable {
     private String body;
     private int type;
     private int textColor;
-    private Date dateCreate;
+    private String dateCreate;
     private String imageS;
     private String backgroundS;
     private String mutilColor;
+    private int fontSize;
+    private int fontStyle;
 
-    public Note(int id, String label, String body,
-                int type, int textColor,
-                String imageS, Date dateCreate,
-                String backgroundS, String mutilColor) {
+    public Note(int id, String label, String body, int type,
+                int textColor, String dateCreate, String imageS,
+                String backgroundS, String mutilColor, int fontSize, int fontStyle) {
         this.id = id;
         this.label = label;
         this.body = body;
@@ -31,38 +31,28 @@ public class Note implements Serializable {
         this.imageS = imageS;
         this.backgroundS = backgroundS;
         this.mutilColor = mutilColor;
+        this.fontSize = fontSize;
+        this.fontStyle = fontStyle;
     }
 
-    public Note(int id, String label, String body,
-                int type, int textColor, String imageS,
-                String backgroundS, String mutilColor) {
-        this.id = id;
-        this.label = label;
-        this.body = body;
-        this.type = type;
-        this.textColor = textColor;
-        this.imageS = imageS;
-        this.backgroundS = backgroundS;
-        this.mutilColor = mutilColor;
-    }
-
-
-    public Note(String label, String body,
-                int type, int textColor, String imageS,
-                String backgroundS, String mutilColor,
-                Date dateCreate) {
+    public Note(String label, String body, int type, int textColor,
+                String dateCreate, String imageS,
+                String backgroundS, String mutilColor, int fontSize, int fontStyle) {
         this.label = label;
         this.body = body;
         this.type = type;
         this.textColor = textColor;
         this.dateCreate = dateCreate;
+        this.imageS = imageS;
         this.backgroundS = backgroundS;
-        this.imageS  = imageS;
         this.mutilColor = mutilColor;
+        this.fontSize = fontSize;
+        this.fontStyle = fontStyle;
     }
 
     public Note(String label, String body, int type,
-                int textColor, String imageS, String backgroundS, String mutilColor) {
+                int textColor, String imageS, String backgroundS,
+                String mutilColor, int fontSize, int fontStyle) {
         this.label = label;
         this.body = body;
         this.type = type;
@@ -70,6 +60,23 @@ public class Note implements Serializable {
         this.imageS = imageS;
         this.backgroundS = backgroundS;
         this.mutilColor = mutilColor;
+        this.fontSize = fontSize;
+        this.fontStyle = fontStyle;
+    }
+
+    public Note(int id, String label, String body, int type,
+                int textColor, String imageS, String backgroundS,
+                String mutilColor, int fontSize, int fontStyle) {
+        this.id = id;
+        this.label = label;
+        this.body = body;
+        this.type = type;
+        this.textColor = textColor;
+        this.imageS = imageS;
+        this.backgroundS = backgroundS;
+        this.mutilColor = mutilColor;
+        this.fontSize = fontSize;
+        this.fontStyle = fontStyle;
     }
 
     public String getMutilColor() {
@@ -120,11 +127,11 @@ public class Note implements Serializable {
         this.textColor = textColor;
     }
 
-    public Date getDateCreate() {
+    public String getDateCreate() {
         return dateCreate;
     }
 
-    public void setDateCreate(Date dateCreate) {
+    public void setDateCreate(String dateCreate) {
         this.dateCreate = dateCreate;
     }
 
@@ -143,4 +150,21 @@ public class Note implements Serializable {
     public void setBackgroundS(String backgroundS) {
         this.backgroundS = backgroundS;
     }
+
+    public int getFontSize() {
+        return fontSize;
+    }
+
+    public void setFontSize(int fontSize) {
+        this.fontSize = fontSize;
+    }
+
+    public int getFontStyle() {
+        return fontStyle;
+    }
+
+    public void setFontStyle(int fontStyle) {
+        this.fontStyle = fontStyle;
+    }
+
 }

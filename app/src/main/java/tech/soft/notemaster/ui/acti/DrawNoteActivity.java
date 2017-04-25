@@ -14,6 +14,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import tech.soft.notemaster.R;
 import tech.soft.notemaster.controls.DatabaseHelper;
 import tech.soft.notemaster.models.Note;
@@ -241,21 +244,24 @@ public class DrawNoteActivity extends BaseActivity implements View.OnClickListen
     }
 
     private void update(String data) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String lable = edtLabel.getText().toString();
         String body = data;
         int currColr = curentColor;
         int type = TYPE_HAND_DWRAW;
-        Note noteTmp = new Note(note.getId(), lable, body, type, currColr, "", "", "");
+        String dateS = simpleDateFormat.format(new Date());
+        Note noteTmp = new Note(note.getId(), lable, body, type, currColr, dateS, "", "", "", 1, 1);
         DatabaseHelper.getINSTANCE(this).updateData(noteTmp);
     }
 
     private void saveNote(String data) {
-
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String lable = edtLabel.getText().toString();
         String body = data;
         int currColr = curentColor;
         int type = TYPE_HAND_DWRAW;
-        Note noteTmp = new Note(lable, body, type, currColr, "", "", "");
+        String dateS = simpleDateFormat.format(new Date());
+        Note noteTmp = new Note(lable, body, type, currColr, dateS, "", "", "", 1, 1);
         DatabaseHelper.getINSTANCE(this).insertData(noteTmp);
     }
 }

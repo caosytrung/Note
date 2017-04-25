@@ -29,7 +29,9 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import tech.soft.notemaster.R;
@@ -376,7 +378,12 @@ public class QuickWorkService extends Service implements View.OnClickListener, I
             String lable = edtLable.getText().toString();
             String body = edtBody.getText().toString();
             int type = TYPE_TEXT;
-        Note noteTmp = new Note(lable, body, type, currentColor, "", getListBackgroundS(), getListColorS());
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String dateS = simpleDateFormat.format(new Date());
+        Note noteTmp = new Note(lable, body, type, currentColor,
+                "", getListBackgroundS(), getListColorS(), dateS,
+                Integer.parseInt(getString(R.string.text_size_1)), 1
+        );
         return DatabaseHelper.getINSTANCE(this).insertData(noteTmp);
 
     }

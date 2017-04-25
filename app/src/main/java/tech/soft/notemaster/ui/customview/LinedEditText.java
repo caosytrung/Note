@@ -2,12 +2,9 @@ package tech.soft.notemaster.ui.customview;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.text.Editable;
 import android.util.AttributeSet;
-import android.view.View;
 import android.widget.EditText;
 
 import tech.soft.notemaster.R;
@@ -19,8 +16,15 @@ import tech.soft.notemaster.R;
 public class LinedEditText extends EditText {
     private Rect mRect;
     private Paint mPaint;
+    private IDelete iDelete;
 
+    public IDelete getiDelete() {
+        return iDelete;
+    }
 
+    public void setiDelete(IDelete iDelete) {
+        this.iDelete = iDelete;
+    }
 
     // we need this constructor for LayoutInflater
     public LinedEditText(Context context, AttributeSet attrs) {
@@ -31,6 +35,7 @@ public class LinedEditText extends EditText {
 //        mPaint.setStyle(Paint.Style.FILL_AND_STROKE);
 //        mPaint.setColor(Color.parseColor("#C0C0C0")); //SET YOUR OWN COLOR HERE
     }
+
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -54,12 +59,16 @@ public class LinedEditText extends EditText {
         for (int i = 0; i < count*5; i++) {
 
 
-            canvas.drawLine(0, baseline -40 , getWidth(), baseline -40
+            canvas.drawLine(0, baseline - getLineHeight() * 2 / 3, getWidth(), baseline - getLineHeight() * 2 / 3
                     , mPaint);
             baseline += getLineHeight();//next line
         }
 
         super.onDraw(canvas);
+    }
+
+    public interface IDelete {
+        void delete();
     }
 
 }

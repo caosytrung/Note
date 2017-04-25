@@ -18,8 +18,6 @@ import tech.soft.notemaster.ui.calback.IOnItemClick;
 import tech.soft.notemaster.utils.IConstand;
 import tech.soft.notemaster.utils.Utils;
 
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.V;
-
 /**
  * Created by dee on 03/04/2017.
  */
@@ -72,7 +70,7 @@ public class NoteMainAdapter extends RecyclerView.Adapter<NoteMainAdapter.ViewHo
             case TYPE_TEXT:
                 ViewHolderType1 viewHolderType1 = (ViewHolderType1)holder;
                 viewHolderType1.tvLable.setText(note.getLabel());
-                viewHolderType1.tvDate.setText(simpleDateFormat.format(note.getDateCreate()));
+                viewHolderType1.tvDate.setText(note.getDateCreate());
                 viewHolderType1.tvPBody.setText(note.getBody());
                 viewHolderType1.tvPBody.setTextColor(note.getTextColor());
 

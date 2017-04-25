@@ -11,10 +11,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import tech.soft.notemaster.models.Note;
@@ -40,6 +38,8 @@ public class DatabaseHelper implements IConstand {
     public static  final  String IMAGE_S_ROW = "imageS";
     public static final String BACKGROUND_ROW = "highlight";
     public static final String MUTIL_COLOR_ROW = "mutilColor";
+    private static final String FONT_SIZE_ROW = "fontSize";
+    private static final String FONT_STYLE_ROW = "fontStyle";
 
     private SimpleDateFormat dateFormat ;
     private Context mContext;
@@ -90,6 +90,9 @@ public class DatabaseHelper implements IConstand {
         int indexImageS = c.getColumnIndex(IMAGE_S_ROW);
         int indexBackgroundS = c.getColumnIndex(BACKGROUND_ROW);
         int indexMultilColor = c.getColumnIndex(MUTIL_COLOR_ROW);
+        int indexFontStyle = c.getColumnIndex(FONT_STYLE_ROW);
+        int indexFontSize = c.getColumnIndex(FONT_SIZE_ROW);
+
 
         c.moveToFirst();
 
@@ -103,17 +106,15 @@ public class DatabaseHelper implements IConstand {
             Log.d(TAG,"Formatttt" + " " + dateS);
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String imageS= c.getString(indexImageS);
-            Date date = null;
-            try {
-                date = simpleDateFormat.parse(dateS);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
             String mutilColor = c.getString(indexMultilColor);
             String background = c.getString(indexBackgroundS);
+            int fontSize = c.getInt(indexFontSize);
+            int fontStyle = c.getInt(indexFontStyle);
+
             Note tmp = new Note(id, lable, body, type,
-                    textColor, imageS, date, background, mutilColor);
+                    textColor, dateS, imageS, background, mutilColor,
+                    fontSize, fontStyle);
+
             noteList.add(tmp);
             Log.d(TAG,tmp.getImageS());
 
@@ -126,21 +127,23 @@ public class DatabaseHelper implements IConstand {
     }
 
     public int insertData(Note note){
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         ContentValues contentValues  = new ContentValues();
         contentValues.put(LABLE_ROW,note.getLabel());
         contentValues.put(BODY_ROW,note.getBody());
         contentValues.put(TYPE_ROW,note.getType());
         contentValues.put(TEXT_COLOR__ROW,note.getTextColor());
-        contentValues.put(DATE_ROW,simpleDateFormat.format(new Date()));
+        contentValues.put(DATE_ROW, note.getDateCreate());
         contentValues.put(IMAGE_S_ROW,note.getImageS());
         contentValues.put(BACKGROUND_ROW, note.getBackgroundS());
         contentValues.put(MUTIL_COLOR_ROW, note.getMutilColor());
+        contentValues.put(FONT_SIZE_ROW, note.getFontSize());
+        contentValues.put(FONT_STYLE_ROW, note.getFontStyle());
 
         Log.d(TAG,note.getImageS());
 
         openDatabase();
         int a = (int) mSqLiteDatabase.insert(TABLE_NAME,null,contentValues);
+
         Log.d(TAG,a+"");
         closeDatabase();
         return a;
@@ -149,19 +152,62 @@ public class DatabaseHelper implements IConstand {
 
     public boolean updateData(Note note){
         openDatabase();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
         ContentValues contentValues  = new ContentValues();
         contentValues.put(LABLE_ROW,note.getLabel());
         contentValues.put(BODY_ROW,note.getBody());
         contentValues.put(TYPE_ROW,note.getType());
         contentValues.put(TEXT_COLOR__ROW,note.getTextColor());
-        contentValues.put(DATE_ROW,simpleDateFormat.format(new Date()));
+        contentValues.put(DATE_ROW, note.getDateCreate());
         contentValues.put(IMAGE_S_ROW,note.getImageS());
         contentValues.put(BACKGROUND_ROW, note.getBackgroundS());
         contentValues.put(MUTIL_COLOR_ROW, note.getMutilColor());
+        contentValues.put(FONT_SIZE_ROW, note.getFontSize());
+        contentValues.put(FONT_STYLE_ROW, note.getFontStyle());
 
         return mSqLiteDatabase.update(TABLE_NAME,contentValues,"id = '" + note.getId() + "'",null) > 0;
 
+    }
+
+    public Note getNoteFromDate(String dateSS) {
+        openDatabase();
+        String query = "SELECT * FROM note WHERE dateCreate= '" + dateSS + "'";
+        Cursor c = mSqLiteDatabase.rawQuery(query, null);
+
+        int indexId = c.getColumnIndex(ID_ROW);
+        int indexLable = c.getColumnIndex(LABLE_ROW);
+        int indexBody = c.getColumnIndex(BODY_ROW);
+        int indexType = c.getColumnIndex(TYPE_ROW);
+        int indextTextColor = c.getColumnIndex(TEXT_COLOR__ROW);
+        int indexDate = c.getColumnIndex(DATE_ROW);
+        int indexImageS = c.getColumnIndex(IMAGE_S_ROW);
+        int indexBackgroundS = c.getColumnIndex(BACKGROUND_ROW);
+        int indexMultilColor = c.getColumnIndex(MUTIL_COLOR_ROW);
+        int indexFontStyle = c.getColumnIndex(FONT_STYLE_ROW);
+        int indexFontSize = c.getColumnIndex(FONT_SIZE_ROW);
+
+
+        c.moveToFirst();
+        String body = c.getString(indexBody);
+        String lable = c.getString(indexLable);
+        int id = c.getInt(indexId);
+        int type = c.getInt(indexType);
+        int textColor = c.getInt(indextTextColor);
+        String dateS = c.getString(indexDate);
+        Log.d(TAG, "Formatttt" + " " + dateS);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String imageS = c.getString(indexImageS);
+        String mutilColor = c.getString(indexMultilColor);
+        String background = c.getString(indexBackgroundS);
+        int fontSize = c.getInt(indexFontSize);
+        int fontStyle = c.getInt(indexFontStyle);
+
+        Note tmp = new Note(id, lable, body, type,
+                textColor, dateS, imageS, background, mutilColor,
+                fontSize, fontStyle);
+        c.close();
+        closeDatabase();
+        return tmp;
     }
 
     public void closeDatabase(){

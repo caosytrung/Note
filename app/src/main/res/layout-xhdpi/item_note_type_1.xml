@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <android.support.v7.widget.CardView
+        android:layout_margin="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        card_view:cardCornerRadius="8dp"
+        android:elevation="5dp">
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            card_view:cardCornerRadius="8dp"
+            android:elevation="5dp">
+
+            <LinearLayout
+                android:background="@color/whiteGray"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_weight="3">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_weight="1"
+                        android:layout_height="0dp"
+                        android:textSize="22dp"
+                        android:gravity="left"
+                        android:layout_marginLeft="4dp"
+                        android:layout_marginRight="4dp"
+                        android:id="@+id/tvItemNoteLable"
+                        android:textColor="@color/black" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1.38"
+                        android:textSize="16dp"
+                        android:textColor="@color/grey"
+                        android:id="@+id/tvItemNoteBody"
+                        android:layout_margin="4dp"
+                        android:padding="2dp" />
+                </LinearLayout>
+
+                <TextView
+                    android:gravity="right"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:id="@+id/tvitemNoteDate"
+                    android:textColor="#424242"
+                    android:text="date"
+                    android:textSize="12dp"
+                    android:layout_marginRight="4dp"
+                    android:layout_marginTop="2dp"
+                    android:textStyle="italic" />
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>

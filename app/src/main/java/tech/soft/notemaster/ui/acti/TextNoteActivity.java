@@ -1,16 +1,17 @@
 package tech.soft.notemaster.ui.acti;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.support.design.widget.FloatingActionButton;
 import android.support.test.espresso.core.deps.guava.reflect.TypeToken;
 import android.text.Editable;
 import android.text.Html;
-import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -26,25 +27,31 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.PopupMenu;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import tech.soft.notemaster.R;
+import tech.soft.notemaster.broadcast.AlarmReceiver;
 import tech.soft.notemaster.controls.DatabaseHelper;
 import tech.soft.notemaster.models.Note;
 import tech.soft.notemaster.models.sp_view.BackgroundS;
 import tech.soft.notemaster.models.sp_view.ImageS;
+import tech.soft.notemaster.ui.adapter.FontSizeAdapter;
 import tech.soft.notemaster.ui.adapter.PenColorAdapter;
+import tech.soft.notemaster.ui.adapter.TextFontAdapter;
 import tech.soft.notemaster.ui.calback.ISetTextNote;
+import tech.soft.notemaster.ui.customview.AlramDialog;
 import tech.soft.notemaster.ui.customview.ColorDialog;
 import tech.soft.notemaster.utils.IConstand;
 import tech.soft.notemaster.utils.Utils;
@@ -57,18 +64,30 @@ public class TextNoteActivity extends BaseActivity implements View.OnClickListen
     public static final String TAG = "mTextNoteActivity";
     private static final int RQ_GALL = 1;
 
-    private List<String> listColor;
-    private List<Integer> listWord;
     private EditText edtLabel;
     private EditText edtBody;
-    private ImageView ivMenu;
-    private FloatingActionButton btnAdd;
-    private Spinner spPenColor;
-    private PenColorAdapter mPenColorAdapter;
+
     private int currentColor;
-    private Spannable mSpannableText;
     public Note note;
     private boolean isEdit;
+
+    private Spinner spPenColor;
+    private PenColorAdapter mPenColorAdapter;
+    private Spinner spFontSize;
+    private FontSizeAdapter mFontSizeAdapter;
+    private Spinner spFontStyle;
+    private TextFontAdapter mTextFontAdapter;
+    private List<String> listColor;
+    private List<Integer> listFontSize;
+    private List<Typeface> listFontStyle;
+    private TextView tvSelectImage;
+    private TextView tvAddNote;
+    private TextView tvBack;
+    private TextView tvAlarm;
+    private AlarmManager mAlarmManager;
+    private PendingIntent mPendingIntentAlarm;
+    private Calendar calendar;
+
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -89,10 +108,12 @@ public class TextNoteActivity extends BaseActivity implements View.OnClickListen
         }
 
         listColor = Utils.initListColor();
+        listFontSize = Utils.listTextSize(this);
+        listFontStyle = Utils.listFontStyle(this);
+
         mPenColorAdapter = new PenColorAdapter(this, listColor);
-        currentColor = getResources().getColor(R.color.black);
-        mSpannableText = new SpannableString("");
-        listWord = new ArrayList<>();
+        mTextFontAdapter = new TextFontAdapter(this, listFontStyle);
+        mFontSizeAdapter = new FontSizeAdapter(this, listFontSize);
 
 
     }
@@ -100,16 +121,31 @@ public class TextNoteActivity extends BaseActivity implements View.OnClickListen
     @Override
     protected void initViews() {
         spPenColor = (Spinner) findViewById(R.id.spPenColor);
+        spFontSize = (Spinner) findViewById(R.id.spFontSize);
+        spFontStyle = (Spinner) findViewById(R.id.spFontStyle);
+
+        tvAlarm = (TextView) findViewById(R.id.tvAlarmTextNote);
+        tvBack = (TextView) findViewById(R.id.tvBackTextNote);
+        tvAddNote = (TextView) findViewById(R.id.tvSaveTextNote);
+        tvSelectImage = (TextView) findViewById(R.id.tvSelectImage);
         edtLabel = (EditText) findViewById(R.id.edtLabelText);
         edtBody = (EditText) findViewById(R.id.edtBobyTextNote);
-        ivMenu = (ImageView) findViewById(R.id.ivMenuText);
-        btnAdd = (FloatingActionButton) findViewById(R.id.btnAddTextNote);
-        ivMenu.setOnClickListener(this);
 
-        btnAdd.setOnClickListener(this);
+        Utils.setFontAnswesSomeTextView(tvAddNote, this);
+        Utils.setFontAnswesSomeTextView(tvBack, this);
+        Utils.setFontAnswesSomeTextView(tvSelectImage, this);
+        Utils.setFontAnswesSomeTextView(tvAlarm, this);
+
+        tvAlarm.setText("\uf017");
+        tvAddNote.setText("\uf0c7");
+        tvSelectImage.setText("\uf03e");
+        tvBack.setText("\uf053");
+        tvSelectImage.setOnClickListener(this);
+        tvBack.setOnClickListener(this);
+        tvAddNote.setOnClickListener(this);
+        tvAlarm.setOnClickListener(this);
 
         spPenColor.setAdapter(mPenColorAdapter);
-        edtBody.setTextColor(currentColor);
         spPenColor.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -122,13 +158,72 @@ public class TextNoteActivity extends BaseActivity implements View.OnClickListen
 
             }
         });
+
+        spFontSize.setAdapter(mFontSizeAdapter);
+        spFontSize.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                edtBody.setTextSize(listFontSize.get(position));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        spFontStyle.setAdapter(mTextFontAdapter);
+        spFontStyle.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                edtBody.setTypeface(listFontStyle.get(position));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+
+//        edtBody.setiDelete(new LinedEditText.IDelete() {
+//            @Override
+//            public void delete()
+// {
+//                SpannableString spannableString = new SpannableString(edtBody.getText());
+//
+//                ImageSpan[] imageSpen = spannableString.
+//                        getSpans(0,edtBody.length(),ImageSpan.class);
+//                for (ImageSpan imageSpan : imageSpen){
+//                    int s = edtBody.getText().getSpanStart(imageSpan);
+//                    int e = edtBody.getText().getSpanEnd(imageSpan);
+//                    String uri = edtBody.getText().toString().substring(s,e);
+//                    Log.d("posttt",edtBody.getSelectionEnd() + " " + edtBody.getSelectionStart() + " "+ s+  " " + e);
+//
+//                }
+//            }
+//        });
+
         if (isEdit){
             edtLabel.setText(note.getLabel());
+            edtBody.setTextSize(note.getFontSize());
+            spFontStyle.setSelection(note.getFontStyle());
+
+            for (int i = 0; i < listFontSize.size(); i++) {
+                if (listFontSize.get(i) == note.getFontSize()) {
+                    spFontSize.setSelection(i);
+                    break;
+                }
+            }
+            edtBody.setTypeface(listFontStyle.get(note.getFontStyle()));
+            Log.d("zssie", note.getFontSize() + " ");
             SpannableStringBuilder builder =
                     new SpannableStringBuilder(note.getBody());
 
-             Type type1 = new TypeToken<ArrayList<ImageS>>() {}.getType();
-             ArrayList<ImageS> finalOutputString = new Gson().fromJson(note.getImageS(), type1);
+            Type type1 = new TypeToken<ArrayList<ImageS>>() {
+            }.getType();
+            ArrayList<ImageS> finalOutputString = new Gson().fromJson(note.getImageS(), type1);
 
             Type type2 = new TypeToken<ArrayList<BackgroundS>>() {
             }.getType();
@@ -194,8 +289,6 @@ public class TextNoteActivity extends BaseActivity implements View.OnClickListen
             }
 
             edtBody.setText(builder);
-
-
             for (int i = 0 ; i < Utils.initListColor().size() ; i ++){
                 if (Color.parseColor(Utils.initListColor().get(i)) == note.getTextColor() ){
                     spPenColor.setSelection(i);
@@ -288,26 +381,6 @@ public class TextNoteActivity extends BaseActivity implements View.OnClickListen
         edtBody.setText(builder);
     }
 
-    private void setUpMenu(){
-        PopupMenu popupMenu = new PopupMenu(this,ivMenu);
-        popupMenu.getMenuInflater().inflate(R.menu.menu_note,popupMenu.getMenu());
-
-        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()){
-                    case R.id.insert_image:
-                        selectImage();
-                        break;
-                    default:
-                        break;
-                }
-                return true;
-            }
-        });
-        popupMenu.show();
-
-    }
 
     private void selectImage() {
         Intent intentGallery = new Intent(Intent.ACTION_PICK);
@@ -315,9 +388,13 @@ public class TextNoteActivity extends BaseActivity implements View.OnClickListen
         startActivityForResult(intentGallery, RQ_GALL);
     }
     public Bitmap getResizedBitmap(Bitmap bm, int newWidth, int newHeight) {
+
+
+        newHeight = Integer.valueOf(getResources().getString(R.string.size));
+        Log.d("asdsadasda", "ndfdslfnsdlfs " + newHeight);
         int width = bm.getWidth();
         int height = bm.getHeight();
-        float scaleWidth = ((float) newWidth) / width;
+
         float scaleHeight = ((float) newHeight) / height;
         // CREATE A MATRIX FOR THE MANIPULATION
         Matrix matrix = new Matrix();
@@ -356,11 +433,9 @@ public class TextNoteActivity extends BaseActivity implements View.OnClickListen
                         SpannableStringBuilder builder = new SpannableStringBuilder(edtBody.getText());
 
                         builder.insert(selectionCursor,"\n" + a + "\n");
-                        builder.setSpan(new ImageSpan(bitmap),
+                        builder.setSpan(new ImageSpan(bitmap, ImageSpan.ALIGN_BASELINE),
                                 selectionCursor + 1 ,selectionCursor + 1 + a.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
                         );
-
-
                         edtBody.setText(builder);
                         edtBody.setSelection(selectionCursor + a.length() + 2);
                     } catch (IOException e) {
@@ -389,7 +464,11 @@ public class TextNoteActivity extends BaseActivity implements View.OnClickListen
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-            case R.id.btnAddTextNote:
+            case R.id.tvSaveTextNote:
+                if (edtLabel.getText().length() == 0) {
+                    Toast.makeText(TextNoteActivity.this, "Please Enter your Label", Toast.LENGTH_LONG).show();
+                    return;
+                }
 
                 if (!isEdit){
                     Log.d("zaooo","vaoed");
@@ -412,9 +491,21 @@ public class TextNoteActivity extends BaseActivity implements View.OnClickListen
 
 
                 break;
-            case R.id.ivMenuText:
-                Log.d(TAG,"ivMenuText");
-                setUpMenu();
+            case R.id.tvSelectImage:
+                selectImage();
+                break;
+            case R.id.tvBackTextNote:
+                Intent intent = new Intent(this, MainActivity.class);
+                startActivity(intent);
+                this.finish();
+
+                break;
+            case R.id.tvAlarmTextNote:
+                AlramDialog dialog = new AlramDialog(TextNoteActivity.this
+
+                );
+                dialog.show();
+
                 break;
             default:
                 break;
@@ -437,6 +528,15 @@ public class TextNoteActivity extends BaseActivity implements View.OnClickListen
         return inputString;
     }
 
+    private int getStyle() {
+        return spFontStyle.getSelectedItemPosition();
+    }
+
+    private int getTextSize() {
+        Log.d("zisee", listFontSize.get(spFontSize.getSelectedItemPosition()) + "");
+        return listFontSize.get(spFontSize.getSelectedItemPosition());
+    }
+
     private String getListColorS() {
         SpannableString spannableString = new SpannableString(edtBody.getText());
         List<BackgroundS> backgroundSes = new ArrayList<>();
@@ -454,6 +554,7 @@ public class TextNoteActivity extends BaseActivity implements View.OnClickListen
     }
 
     private void saveNote() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Editable editable = edtBody.getText();
         SpannableString spannableString = new SpannableString(editable);
         String html = Html.toHtml(spannableString);
@@ -479,11 +580,16 @@ public class TextNoteActivity extends BaseActivity implements View.OnClickListen
         String body = edtBody.getText().toString();
         int currColr = currentColor;
         int type = TYPE_TEXT;
-        Note noteTmp = new Note(lable, body, type, currColr, inputString, getListBackgroundS(), getListColorS());
+        String dateS = simpleDateFormat.format(new Date());
+        Note noteTmp = new Note(lable, body, type, currColr, dateS,
+                inputString, getListBackgroundS(),
+                getListColorS(), getTextSize(), getStyle());
         DatabaseHelper.getINSTANCE(this).insertData(noteTmp);
+        startAlarm(dateS);
 
     }
     private void update() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Editable editable = edtBody.getText();
         SpannableString spannableString = new SpannableString(editable);
         String html = Html.toHtml(spannableString);
@@ -508,14 +614,44 @@ public class TextNoteActivity extends BaseActivity implements View.OnClickListen
         String body = edtBody.getText().toString();
         int currColr = currentColor;
         int type = TYPE_TEXT;
+        String dateS = simpleDateFormat.format(new Date());
         Note noteTmp = new Note(note.getId(), lable, body,
-                type, currColr, inputString, getListBackgroundS(), getListColorS());
+                type, currColr, dateS, inputString, getListBackgroundS(),
+                getListColorS(), getTextSize(), getStyle());
 
         if (DatabaseHelper.getINSTANCE(this).updateData(noteTmp)){
             Toast.makeText(this,"Update Success !!",Toast.LENGTH_LONG).show();
         } else {
             Toast.makeText(this,"Update Failer  !!",Toast.LENGTH_LONG).show();
         }
+        startAlarm(dateS);
+
+    }
+
+    private void startAlarm(String dateS) {
+        if (null != mAlarmManager) {
+            Intent intent = new Intent(this, AlarmReceiver.class);
+            intent.setAction("hahaha");
+            intent.putExtra("DATE_S", dateS);
+            mPendingIntentAlarm = PendingIntent.
+                    getBroadcast(this, 0, intent, 0);
+            Log.d("asdasd", "qqsadasldasasdas");
+            mAlarmManager.set(AlarmManager.RTC_WAKEUP,
+                    calendar.getTimeInMillis(), mPendingIntentAlarm);
+        }
+    }
+
+    public void setupAlarm(int minute, int hour,
+                           int day, int month, int year) {
+        mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.MONTH, month);
+        calendar.set(Calendar.DAY_OF_MONTH, day);
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, minute);
+        Log.d("asdasd", "q11qsadasldasasdas");
+
 
     }
 }

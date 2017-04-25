@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import tech.soft.notemaster.R;
+
 /**
  * Created by dee on 24/03/2017.
  */
@@ -95,6 +97,23 @@ public class Utils {
         return listColor;
     }
 
+    public static List<Typeface> listFontStyle(Context context) {
+        List<Typeface> fontList = new ArrayList<>();
+        fontList.add(Typeface.DEFAULT);
+        fontList.add(Typeface.createFromAsset(context.getAssets(), "font1.ttf"));
+        fontList.add(Typeface.createFromAsset(context.getAssets(), "font2.ttf"));
+        fontList.add(Typeface.createFromAsset(context.getAssets(), "font3.ttf"));
+        return fontList;
+    }
+
+    public static List<Integer> listTextSize(Context context) {
+        List<Integer> sizeList = new ArrayList<>();
+        sizeList.add(Integer.parseInt(context.getString(R.string.text_size_1)));
+        sizeList.add(Integer.parseInt(context.getString(R.string.text_size_2)));
+        sizeList.add(Integer.parseInt(context.getString(R.string.text_size_3)));
+        return sizeList;
+    }
+
 
     public static String bitMapToString(Bitmap bitmap){
         ByteArrayOutputStream baos=new  ByteArrayOutputStream();
@@ -134,6 +153,11 @@ public class Utils {
                 Manifest.permission.READ_EXTERNAL_STORAGE) ==
                 PackageManager.PERMISSION_DENIED) {
             permissionRequestS.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+        }
+        if (ActivityCompat.checkSelfPermission(act,
+                Manifest.permission.VIBRATE) ==
+                PackageManager.PERMISSION_DENIED) {
+            permissionRequestS.add(Manifest.permission.VIBRATE);
         }
 
 

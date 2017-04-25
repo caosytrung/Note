@@ -31,4 +31,13 @@
         <item name="colorControlHighlight">@color/black</item>
     </style>
     <color name="black">#000000</color>
+
+    <style name="btnDialog">
+        <item name="android:colorButtonNormal">@color/black</item>
+        <item name="colorButtonNormal">@color/black</item>
+        <item name="android:textColor">@color/greenLight</item>
+        <item name="android:elevation">3dp</item>
+        <item name="android:translationZ">3dp</item>
+        <item name="android:background">@drawable/btn_alram</item>
+    </style>
 </resources>
