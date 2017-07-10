@@ -60,12 +60,16 @@ import tech.soft.notemaster.utils.Utils;
  * Created by dee on 23/03/2017.
  */
 
-public class TextNoteActivity extends BaseActivity implements View.OnClickListener,IConstand {
+public class TextNoteActivity extends BaseActivity implements View.OnClickListener, IConstand, AlramDialog.ISetupAlarm {
     public static final String TAG = "mTextNoteActivity";
     private static final int RQ_GALL = 1;
 
     private EditText edtLabel;
     private EditText edtBody;
+    private TextView tvSelectImage;
+    private TextView tvAddNote;
+    private TextView tvBack;
+    private TextView tvAlarm;
 
     private int currentColor;
     public Note note;
@@ -80,13 +84,11 @@ public class TextNoteActivity extends BaseActivity implements View.OnClickListen
     private List<String> listColor;
     private List<Integer> listFontSize;
     private List<Typeface> listFontStyle;
-    private TextView tvSelectImage;
-    private TextView tvAddNote;
-    private TextView tvBack;
-    private TextView tvAlarm;
+
     private AlarmManager mAlarmManager;
     private PendingIntent mPendingIntentAlarm;
     private Calendar calendar;
+    private boolean isVibrate;
 
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -97,6 +99,7 @@ public class TextNoteActivity extends BaseActivity implements View.OnClickListen
 
     @Override
     protected void initComponents() {
+        isVibrate = true;
         switch (getIntent().getAction()){
             case MainActivity.WRITE:
                 isEdit = false;
@@ -504,6 +507,7 @@ public class TextNoteActivity extends BaseActivity implements View.OnClickListen
                 AlramDialog dialog = new AlramDialog(TextNoteActivity.this
 
                 );
+                dialog.setiSetupAlarm(this);
                 dialog.show();
 
                 break;
@@ -633,16 +637,19 @@ public class TextNoteActivity extends BaseActivity implements View.OnClickListen
             Intent intent = new Intent(this, AlarmReceiver.class);
             intent.setAction("hahaha");
             intent.putExtra("DATE_S", dateS);
+            intent.putExtra("VIBRATE", isVibrate);
             mPendingIntentAlarm = PendingIntent.
                     getBroadcast(this, 0, intent, 0);
             Log.d("asdasd", "qqsadasldasasdas");
             mAlarmManager.set(AlarmManager.RTC_WAKEUP,
                     calendar.getTimeInMillis(), mPendingIntentAlarm);
+
         }
     }
 
-    public void setupAlarm(int minute, int hour,
-                           int day, int month, int year) {
+
+    @Override
+    public void setupAlarm(int minute, int hour, int day, int month, int year, boolean isVibrate) {
         mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         calendar = Calendar.getInstance();
         calendar.set(Calendar.YEAR, year);
@@ -650,8 +657,7 @@ public class TextNoteActivity extends BaseActivity implements View.OnClickListen
         calendar.set(Calendar.DAY_OF_MONTH, day);
         calendar.set(Calendar.HOUR_OF_DAY, hour);
         calendar.set(Calendar.MINUTE, minute);
+        this.isVibrate = isVibrate;
         Log.d("asdasd", "q11qsadasldasasdas");
-
-
     }
 }

@@ -1,5 +1,7 @@
 package tech.soft.notemaster.ui.acti;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -15,14 +17,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import tech.soft.notemaster.R;
+import tech.soft.notemaster.broadcast.AlarmReceiver;
 import tech.soft.notemaster.controls.DatabaseHelper;
 import tech.soft.notemaster.models.Note;
 import tech.soft.notemaster.ui.adapter.BGColorAdapter;
 import tech.soft.notemaster.ui.adapter.PenColorAdapter;
 import tech.soft.notemaster.ui.adapter.PenWidthAdapter;
+import tech.soft.notemaster.ui.customview.AlramDialog;
 import tech.soft.notemaster.ui.customview.DrawingView;
 import tech.soft.notemaster.utils.IConstand;
 import tech.soft.notemaster.utils.Utils;
@@ -33,7 +38,7 @@ import static tech.soft.notemaster.R.id.dvDraw;
  * Created by dee on 12/04/2017.
  */
 
-public class DrawNoteActivity extends BaseActivity implements View.OnClickListener ,IConstand{
+public class DrawNoteActivity extends BaseActivity implements View.OnClickListener, IConstand, AlramDialog.ISetupAlarm {
     private PenColorAdapter mPenColorAdapter;
     private PenWidthAdapter mPenWidthAdapter;
     private BGColorAdapter mBgColorAdapter;
@@ -46,6 +51,7 @@ public class DrawNoteActivity extends BaseActivity implements View.OnClickListen
     private TextView tvAddNote;
     private TextView tvUndo;
     private EditText edtLabel;
+    private TextView tvArarm;
 
     private DrawingView dvDrawNote;
     private Bitmap mBitmap;
@@ -54,11 +60,17 @@ public class DrawNoteActivity extends BaseActivity implements View.OnClickListen
     private boolean isEdit;
     private Note note;
 
+    private AlarmManager mAlarmManager;
+    private PendingIntent mPendingIntentAlarm;
+    private Calendar calendar;
+    private boolean isVibrate;
+
 
 
 
     @Override
     protected void initComponents() {
+        isVibrate = true;
         switch (getIntent().getAction()){
             case MainActivity.WRITE:
                 isEdit = false;
@@ -102,6 +114,10 @@ public class DrawNoteActivity extends BaseActivity implements View.OnClickListen
         tvAddNote = (TextView) findViewById(R.id.tvAddDraw);
         edtLabel = (EditText) findViewById(R.id.edtLabelDrawNote);
         ivBack = (ImageView) findViewById(R.id.ivbackDraw);
+        tvArarm = (TextView) findViewById(R.id.tvAlarmDrawNote);
+        Utils.setFontAnswesSomeTextView(tvArarm, this);
+        tvArarm.setText("\uf017");
+
 
         setupDrawNote();
 
@@ -158,6 +174,7 @@ public class DrawNoteActivity extends BaseActivity implements View.OnClickListen
         tvUndo.setOnClickListener(this);
         tvAddNote.setOnClickListener(this);
         ivBack.setOnClickListener(this);
+        tvArarm.setOnClickListener(this);
     }
 
     @Override
@@ -238,6 +255,12 @@ public class DrawNoteActivity extends BaseActivity implements View.OnClickListen
                 startActivity(intent);
                 DrawNoteActivity.this.finish();
                 break;
+            case R.id.tvAlarmDrawNote:
+                AlramDialog dialog = new AlramDialog(this
+                );
+                dialog.setiSetupAlarm(this);
+                dialog.show();
+                break;
             default:
                 break;
         }
@@ -252,6 +275,7 @@ public class DrawNoteActivity extends BaseActivity implements View.OnClickListen
         String dateS = simpleDateFormat.format(new Date());
         Note noteTmp = new Note(note.getId(), lable, body, type, currColr, dateS, "", "", "", 1, 1);
         DatabaseHelper.getINSTANCE(this).updateData(noteTmp);
+        startAlarm(dateS);
     }
 
     private void saveNote(String data) {
@@ -263,5 +287,34 @@ public class DrawNoteActivity extends BaseActivity implements View.OnClickListen
         String dateS = simpleDateFormat.format(new Date());
         Note noteTmp = new Note(lable, body, type, currColr, dateS, "", "", "", 1, 1);
         DatabaseHelper.getINSTANCE(this).insertData(noteTmp);
+        startAlarm(dateS);
+    }
+
+    private void startAlarm(String dateS) {
+        if (null != mAlarmManager) {
+            Intent intent = new Intent(this, AlarmReceiver.class);
+            intent.setAction("hahaha");
+            intent.putExtra("VIBRATE", isVibrate);
+            intent.putExtra("DATE_S", dateS);
+            mPendingIntentAlarm = PendingIntent.
+                    getBroadcast(this, 0, intent, 0);
+            Log.d("asdasd", "qqsadasldasasdas");
+            mAlarmManager.set(AlarmManager.RTC_WAKEUP,
+                    calendar.getTimeInMillis(), mPendingIntentAlarm);
+
+        }
+    }
+
+    @Override
+    public void setupAlarm(int minute, int hour, int day, int month, int year, boolean isVibrate) {
+        mAlarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.MONTH, month);
+        calendar.set(Calendar.DAY_OF_MONTH, day);
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, minute);
+        this.isVibrate = isVibrate;
+        Log.d("asdasd", "q11qsadasldasasdas");
     }
 }

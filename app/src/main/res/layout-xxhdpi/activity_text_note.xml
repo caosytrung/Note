@@ -35,7 +35,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:dropDownWidth="match_parent"
-                android:layout_marginLeft="8dp"
+                android:layout_marginLeft="4dp"
                 android:gravity="center"
                 android:layout_gravity="center"></Spinner>
 
@@ -52,23 +52,35 @@
             <Spinner
                 android:background="#FAFAFA"
                 android:id="@+id/spFontStyle"
-                android:layout_marginRight="4dp"
+                android:layout_marginRight="8dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:dropDownWidth="match_parent"
-                android:layout_marginLeft="4dp"
+                android:layout_marginLeft="8dp"
                 android:layout_gravity="center"></Spinner>
+
 
             <TextView
                 android:background="#FAFAFA"
                 android:id="@+id/tvSelectImage"
-                android:layout_marginRight="8dp"
+                android:layout_marginRight="16dp"
                 android:layout_width="wrap_content"
                 android:gravity="center"
                 android:layout_height="64dp"
                 android:textSize="24dp"
                 android:textColor="@color/greenLight"
                 android:layout_marginLeft="8dp"></TextView>
+
+            <TextView
+                android:background="#FAFAFA"
+                android:id="@+id/tvAlarmTextNote"
+                android:layout_marginRight="16dp"
+                android:layout_width="wrap_content"
+                android:gravity="center"
+                android:layout_height="64dp"
+                android:textSize="26dp"
+                android:textColor="@color/greenLight"
+                android:layout_marginLeft="4dp"></TextView>
 
             <TextView
                 android:background="#FAFAFA"

@@ -185,6 +185,9 @@ public class DatabaseHelper implements IConstand {
         int indexMultilColor = c.getColumnIndex(MUTIL_COLOR_ROW);
         int indexFontStyle = c.getColumnIndex(FONT_STYLE_ROW);
         int indexFontSize = c.getColumnIndex(FONT_SIZE_ROW);
+        if (c.getCount() == 0) {
+            return null;
+        }
 
 
         c.moveToFirst();

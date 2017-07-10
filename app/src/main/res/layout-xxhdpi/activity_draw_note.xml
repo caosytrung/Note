@@ -56,13 +56,15 @@
 
             ></Spinner>
 
-        <ImageView
-            android:id="@+id/ivMenuText"
+        <TextView
+            android:textColor="@color/greenLight"
+            android:id="@+id/tvAlarmDrawNote"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_gravity="center"
             android:layout_marginLeft="8dp"
-            android:src="@drawable/ic_menu_note" />
+            android:textSize="30dp"
+            android:gravity="center" />
     </TableRow>
 
     <TableRow

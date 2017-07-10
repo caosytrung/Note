@@ -18,18 +18,24 @@ import tech.soft.notemaster.service.AlarmService;
 public class AlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-        long[] pattern = {0, 1000, 1000, 1000, 1000};
-        Log.d("Adava", "vaarrr");
-        v.vibrate(pattern, -1);
+
         String date = intent.getStringExtra("DATE_S");
+        boolean isVibrate = intent.getBooleanExtra("VIBRATE", true);
+        if (isVibrate) {
+            Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+            long[] pattern = {0, 1000, 1000, 1000, 1000, 1000, 1000};
+            Log.d("Adava", "vaarrr");
+            v.vibrate(pattern, -1);
+        }
         Note note = DatabaseHelper.getINSTANCE(context).getNoteFromDate(date);
+        if (null == note) {
+            return;
+        }
         Intent intent1 = new Intent(context, AlarmService.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable("NOTE", note);
         intent1.putExtras(bundle);
         context.startService(intent1);
-
 
     }
 }
